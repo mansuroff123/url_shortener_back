@@ -3,10 +3,8 @@ import { db } from '../db/mysql.js';
 import { nanoid } from 'nanoid';
 import { UAParser } from 'ua-parser-js';
 
-// 1. Link yaratish (User ID bilan bog'langan holda)
 export const createShortUrl = async (req: Request, res: Response) => {
     const { original_url, description } = req.body;
-    // Auth middlewaredan kelgan userId ni olamiz
     const userId = (req as any).user?.id || null; 
     const code = nanoid(4);
 
@@ -22,7 +20,6 @@ export const createShortUrl = async (req: Request, res: Response) => {
     }
 };
 
-// 2. Faqat login qilgan foydalanuvchining o'z linklarini olish
 export const getMyUrls = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
 
@@ -47,7 +44,6 @@ export const getMyUrls = async (req: Request, res: Response) => {
     }
 };
 
-// 3. Redirect mantiqi (O'zgarmadi, hamma uchun ishlayveradi)
 export const handleRedirect = async (req: Request, res: Response) => {
     const { code } = req.params;
     const cookieName = `v_${code}`;
@@ -85,22 +81,5 @@ export const handleRedirect = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Redirect error:', error);
         res.status(500).send('Server error');
-    }
-};
-
-// Admin uchun barcha linklarni ko'rish (ixtiyoriy)
-export const getAllUrls = async (_req: Request, res: Response) => {
-    try {
-        const [rows] = await db.query(`
-            SELECT u.*, COUNT(v.id) as total_clicks 
-            FROM url u 
-            LEFT JOIN visitor v ON u.id = v.url_id 
-            GROUP BY u.id 
-            ORDER BY u.created_at DESC
-        `);
-        res.json(rows);
-    } catch (error) {
-        console.error('Get All Urls Error:', error);
-        res.status(500).json({ error: 'Data retrieval error' });
     }
 };

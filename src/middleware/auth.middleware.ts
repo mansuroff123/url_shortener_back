@@ -1,34 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export const verifyToken = (req: any, res: Response, next: NextFunction) => {
+const SECRET = process.env.JWT_SECRET || 'secret_key_123';
+
+export const authenticate = (req: any, res: Response, next: NextFunction) => {
     const token = req.headers['authorization']?.split(' ')[1];
 
-    if (!token) return res.status(403).json({ error: "Token not found" });
+    if (!token) return res.status(401).json({ error: "Token topilmadi" });
 
-    jwt.verify(token, process.env.JWT_SECRET || 'secret_key_123', (err: any, decoded: any) => {
-        if (err) return res.status(401).json({ error: "Token wrong" });
+    jwt.verify(token, SECRET, (err: any, decoded: any) => {
+        if (err) return res.status(403).json({ error: "Token xato yoki muddati o'tgan" });
         req.user = decoded;
         next();
     });
 };
 
 export const isAdmin = (req: any, res: Response, next: NextFunction) => {
-    if (req.user.role !== 'admin') {
-        return res.status(403).json({ error: "You are not admin!" });
-    }
-    next();
-};
-
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.status(401).json({ error: "No token provided" });
-
-    jwt.verify(token, process.env.JWT_SECRET || 'secret_key_123', (err: any, user: any) => {
-        if (err) return res.status(403).json({ error: "Invalid token" });
-        (req as any).user = user;
+    if (req.user && req.user.role === 'admin') {
         next();
-    });
+    } else {
+        res.status(403).json({ error: "Kirish taqiqlangan! Siz admin emassiz." });
+    }
 };
+

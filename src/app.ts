@@ -14,11 +14,12 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
+// API yo'llari
 app.use("/api/auth", authRoutes)
 app.use("/api/admin", adminRoutes)
-
 app.use("/api/urls", urlRoutes)
 
+// Redirect yo'li (Har doim eng oxirida turishi shart)
 app.use("/", urlRoutes)
 
 export default app
