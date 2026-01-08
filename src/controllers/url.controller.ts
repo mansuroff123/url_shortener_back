@@ -83,3 +83,39 @@ export const handleRedirect = async (req: Request, res: Response) => {
         res.status(500).send('Server error');
     }
 };
+
+export const getLinkStats = async (req: Request, res: Response) => {
+    const { code } = req.params;
+    const userId = (req as any).user?.id;
+
+    try {
+        const [urlRows]: any = await db.query(
+            'SELECT id, original_url FROM url WHERE code = ? AND user_id = ?',
+            [code, userId]
+        );
+
+        if (urlRows.length === 0) {
+            return res.status(404).json({ error: "Link not found or link is not your" });
+        }
+
+        const urlId = urlRows[0].id;
+
+        // Visitor ma'lumotlarini olamiz
+        const [visitors]: any = await db.query(
+            `SELECT ip, referrer, device, browser, created_at 
+             FROM visitor 
+             WHERE url_id = ? 
+             ORDER BY created_at DESC`,
+            [urlId]
+        );
+
+        res.json({
+            original_url: urlRows[0].original_url,
+            total_clicks: visitors.length,
+            visitors: visitors
+        });
+    } catch (error) {
+        console.error('Stats error:', error);
+        res.status(500).json({ error: 'Serverda xatolik' });
+    }
+};
