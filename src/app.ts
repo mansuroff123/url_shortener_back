@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
-import urlRoutes from "./routes/url.routes.js"
 import cookieParser from "cookie-parser"
+import urlRoutes from "./routes/url.routes.js"
 import authRoutes from './routes/auth.routes.js'
 import adminRoutes from './routes/admin.routes.js'
 
@@ -14,8 +14,11 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-app.use("/", urlRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/admin", adminRoutes)
+
+app.use("/api/urls", urlRoutes)
+
+app.use("/", urlRoutes)
 
 export default app
