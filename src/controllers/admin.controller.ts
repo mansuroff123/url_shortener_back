@@ -22,6 +22,6 @@ export const getAdminStats = async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Statistikani olishda xatolik yuz berdi' });
+        res.status(500).json({ error: 'Failed to fetch statistics' });
     }
 };

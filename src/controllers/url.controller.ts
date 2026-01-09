@@ -6,13 +6,22 @@ import { UAParser } from 'ua-parser-js';
 export const createShortUrl = async (req: Request, res: Response) => {
     const { original_url, description } = req.body;
     const userId = (req as any).user?.id || null; 
-    const code = nanoid(4);
-
+    
     try {
+        let code = nanoid(4);
+
+        const [existing]: any = await db.query('SELECT id FROM url WHERE code = ?', [code]);
+
+        // Agar generatsiya qilingan kodga teng kod generatsiya qilinsa 5 talik kod generatsiya qilinadi
+        if (Array.isArray(existing) && existing.length > 0) {
+            code = nanoid(5);
+        }
+
         await db.query(
             'INSERT INTO url (code, original_url, description, user_id, status) VALUES (?, ?, ?, ?, ?)',
             [code, original_url, description || '', userId, 1]
         );
+
         res.status(201).json({ code, original_url });
     } catch (error) {
         console.error('Url Creation Error:', error);
