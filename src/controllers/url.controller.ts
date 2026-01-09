@@ -109,7 +109,6 @@ export const getLinkStats = async (req: Request, res: Response) => {
 
         const urlId = urlRows[0].id;
 
-        // Visitor ma'lumotlarini olamiz
         const [visitors]: any = await db.query(
             `SELECT ip, referrer, device, browser, created_at 
              FROM visitor 

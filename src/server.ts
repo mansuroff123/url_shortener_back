@@ -3,7 +3,7 @@ import app from './app.js';
 
 
 const PORT: number = Number(process.env.PORT) || 5000;
-const HOST: string = process.env.HOST || '0.0.0.0'; // Barcha tarmoq interfeyslari uchun
+const HOST: string = process.env.HOST || '0.0.0.0';
 const CURRENT_IP: string = process.env.CURRENT_IP || 'localhost';
 
 
